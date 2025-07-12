@@ -15,7 +15,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Mis Citas" />
+            app:title="Mis Citas"
+            app:menu="@menu/menu_perfil" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -27,4 +28,3 @@
         tools:listitem="@layout/appointment_item"/>
 
 </LinearLayout>
-

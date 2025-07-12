@@ -30,4 +30,34 @@ class AppointmentsViewModel(private val repository: AppRepository) : ViewModel()
             }
         }
     }
+
+    fun confirmAppointment(appointmentId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.confirmAppointment(appointmentId)
+                if (response.isSuccessful) {
+                    fetchAppointments()
+                } else {
+                    _errorMessage.value = "Error al confirmar la cita."
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error de conexión."
+            }
+        }
+    }
+
+    fun finalizeAppointment(appointmentId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.finalizeAppointment(appointmentId)
+                if (response.isSuccessful) {
+                    fetchAppointments()
+                } else {
+                    _errorMessage.value = "Error al finalizar el trabajo."
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error de conexión."
+            }
+        }
+    }
 }

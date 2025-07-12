@@ -7,11 +7,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.proyectoapptrabajador.data.model.Cita
 import com.example.proyectoapptrabajador.databinding.AppointmentItemBinding
 
-class CitaAdapter(
+class CitaTrabajadorAdapter(
     private var appointments: List<Cita>,
     private val onItemClick: (Cita) -> Unit,
-    private val onViewLocationClick: (Cita) -> Unit = {} // Nuevo callback para ver ubicación
-) : RecyclerView.Adapter<CitaAdapter.CitaViewHolder>() {
+    private val onViewLocationClick: (Cita) -> Unit = {},
+    private val onConfirmClick: (Cita) -> Unit = {},
+    private val onFinalizeClick: (Cita) -> Unit = {}
+) : RecyclerView.Adapter<CitaTrabajadorAdapter.CitaViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CitaViewHolder {
         val binding = AppointmentItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -31,12 +33,11 @@ class CitaAdapter(
 
     inner class CitaViewHolder(private val binding: AppointmentItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(cita: Cita) {
-            // Mostrar nombre del cliente en lugar del trabajador
-            binding.txtWorkerName.text = cita.client?.name ?: "Cliente no asignado"
+            // Mostrar nombre del cliente (asumiendo que existe en el modelo)
+            binding.txtWorkerName.text = cita.client?.name ?: "Cliente"
             binding.txtCategory.text = cita.category.name
 
             // Configurar el botón "Ver Ubicación"
-            // Solo visible si la cita ha sido concretada (tiene coordenadas)
             if (cita.latitude != null && cita.longitude != null) {
                 binding.btnViewLocation.visibility = View.VISIBLE
                 binding.btnViewLocation.setOnClickListener {
@@ -48,21 +49,21 @@ class CitaAdapter(
 
             // Lógica de visualización condicional adaptada para trabajador
             when (cita.status) {
-                0 -> { // PENDIENTE
+                0 -> {
                     binding.txtAppointmentStatus.text = "Estado: Pendiente de concretar"
                     binding.txtAppointmentDateTime.visibility = View.GONE
                 }
-                1 -> { // CONCRETADA POR CLIENTE
+                1 -> {
                     binding.txtAppointmentStatus.text = "Estado: Concretada por cliente"
                     binding.txtAppointmentDateTime.visibility = View.VISIBLE
                     binding.txtAppointmentDateTime.text = "Fecha: ${cita.appointmentDate} - Hora: ${cita.appointmentTime}"
                 }
-                2 -> { // CONFIRMADA POR TRABAJADOR
+                2 -> {
                     binding.txtAppointmentStatus.text = "Estado: Confirmada - En proceso"
                     binding.txtAppointmentDateTime.visibility = View.VISIBLE
                     binding.txtAppointmentDateTime.text = "Fecha: ${cita.appointmentDate} - Hora: ${cita.appointmentTime}"
                 }
-                3 -> { // FINALIZADA
+                3 -> {
                     binding.txtAppointmentStatus.text = "Estado: Trabajo finalizado"
                     binding.txtAppointmentDateTime.visibility = View.VISIBLE
                     binding.txtAppointmentDateTime.text = "Fecha: ${cita.appointmentDate} - Hora: ${cita.appointmentTime}"

@@ -14,22 +14,22 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.proyectoapptrabajador.R
-import com.example.proyectoapptrabajador.databinding.FragmentAppointmentsBinding
+import com.example.proyectoapptrabajador.databinding.FragmentMisCitasBinding
 import com.example.proyectoapptrabajador.ui.activities.MainActivity
-import com.example.proyectoapptrabajador.ui.adapters.CitaAdapter
-import com.example.proyectoapptrabajador.ui.viewmodels.AppointmentsViewModel
+import com.example.proyectoapptrabajador.ui.adapters.CitaTrabajadorAdapter
+import com.example.proyectoapptrabajador.ui.viewmodels.MisCitasViewModel
 import com.example.proyectoapptrabajador.ui.viewmodels.factories.ViewModelFactory
 
-class AppointmentsFragment : Fragment() {
+class MisCitasFragment : Fragment() {
 
-    private var _binding: FragmentAppointmentsBinding? = null
+    private var _binding: FragmentMisCitasBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: AppointmentsViewModel by viewModels {
+    private val viewModel: MisCitasViewModel by viewModels {
         ViewModelFactory(MainActivity.repository)
     }
 
-    private lateinit var citaAdapter: CitaAdapter
+    private lateinit var adapter: CitaTrabajadorAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +40,7 @@ class AppointmentsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAppointmentsBinding.inflate(inflater, container, false)
+        _binding = FragmentMisCitasBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -64,7 +64,7 @@ class AppointmentsFragment : Fragment() {
         return when (item.itemId) {
             R.id.action_edit_profile -> {
                 // Navegar a la pantalla de editar perfil
-                val action = AppointmentsFragmentDirections.actionAppointmentsFragmentToEditProfileFragment()
+                val action = MisCitasFragmentDirections.actionMisCitasFragmentToEditProfileFragment()
                 findNavController().navigate(action)
                 true
             }
@@ -85,32 +85,24 @@ class AppointmentsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        citaAdapter = CitaAdapter(
-            emptyList(),
+        adapter = CitaTrabajadorAdapter(
+            appointments = emptyList(),
             onItemClick = { cita ->
-                val action = AppointmentsFragmentDirections.actionAppointmentsFragmentToChatFragment(cita.id)
-                findNavController().navigate(action)
-            },
-            onViewLocationClick = { cita ->
-                // Navegar al mapa para mostrar la ubicación de la cita
-                val action = AppointmentsFragmentDirections.actionAppointmentsFragmentToMapFragment(
-                    cita.id,
-                    cita.latitude?.toFloat() ?: 0f,
-                    cita.longitude?.toFloat() ?: 0f
-                )
+                val action = MisCitasFragmentDirections.actionMisCitasFragmentToChatFragment(cita.id)
                 findNavController().navigate(action)
             }
         )
         binding.rvAppointments.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvAppointments.adapter = citaAdapter
+        binding.rvAppointments.adapter = adapter
     }
 
     private fun setupObservers() {
         viewModel.appointments.observe(viewLifecycleOwner) { appointments ->
-            citaAdapter.updateData(appointments)
+            adapter.updateData(appointments)
         }
-        viewModel.errorMessage.observe(viewLifecycleOwner) {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            // Mostrar error
         }
     }
 

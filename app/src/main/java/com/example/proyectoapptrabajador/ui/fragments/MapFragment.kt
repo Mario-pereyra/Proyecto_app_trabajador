@@ -39,31 +39,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-
-        // Configurar opciones de zoom y movimiento
-        setupMapOptions()
-
-        // Mostrar la ubicación recibida como parámetro
-        val location = LatLng(args.latitude.toDouble(), args.longitude.toDouble())
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
-
-        // Configurar el botón de volver
-        setupBackButton()
-    }
-
-    private fun setupMapOptions() {
-        // Habilitar controles de zoom (botones + y -)
-        map.uiSettings.isZoomControlsEnabled = true
-
-        // Habilitar todos los gestos para que el usuario pueda mover el mapa libremente
-        map.uiSettings.isZoomGesturesEnabled = true
-        map.uiSettings.isScrollGesturesEnabled = true
-        map.uiSettings.isRotateGesturesEnabled = true
-        map.uiSettings.isTiltGesturesEnabled = true
-
-        // Configurar niveles de zoom
-        map.setMinZoomPreference(8f)
-        map.setMaxZoomPreference(20f)
+        val appointmentLocation = LatLng(args.latitude.toDouble(), args.longitude.toDouble())
+        map.addMarker(com.google.android.gms.maps.model.MarkerOptions().position(appointmentLocation).title("Ubicación de la Cita"))
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(appointmentLocation, 15f))
     }
 
     private fun setupBackButton() {

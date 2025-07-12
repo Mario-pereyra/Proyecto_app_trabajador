@@ -11,6 +11,7 @@ import com.example.proyectoapptrabajador.data.model.TrabajadorDetalle
 import com.example.proyectoapptrabajador.repositories.AppRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class ChatViewModel(private val repository: AppRepository) : ViewModel() {
@@ -28,6 +29,7 @@ class ChatViewModel(private val repository: AppRepository) : ViewModel() {
     val workerDetails: LiveData<TrabajadorDetalle> = _workerDetails
 
     private var pollingJob: Job? = null
+    private var refreshJob: Job? = null
 
     fun startPollingMessages(appointmentId: Int) {
         pollingJob?.cancel() // Cancela cualquier sondeo anterior
@@ -129,8 +131,52 @@ class ChatViewModel(private val repository: AppRepository) : ViewModel() {
         }
     }
 
+    fun startMessageRefresh(appointmentId: Int) {
+        refreshJob?.cancel()
+        refreshJob = viewModelScope.launch {
+            while (isActive) {
+                fetchMessages(appointmentId)
+                delay(30000)
+            }
+        }
+    }
+
+    fun stopMessageRefresh() {
+        refreshJob?.cancel()
+    }
+
+    fun confirmAppointment(appointmentId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.confirmAppointment(appointmentId)
+                if (response.isSuccessful) {
+                    fetchAppointmentDetails(appointmentId)
+                } else {
+                    _errorMessage.value = "Error al confirmar la cita."
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error de conexión."
+            }
+        }
+    }
+
+    fun finalizeAppointment(appointmentId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.finalizeAppointment(appointmentId)
+                if (response.isSuccessful) {
+                    fetchAppointmentDetails(appointmentId)
+                } else {
+                    _errorMessage.value = "Error al finalizar el trabajo."
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error de conexión."
+            }
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
-        pollingJob?.cancel() // Detiene el sondeo cuando el ViewModel se destruye
+        stopMessageRefresh()
     }
 }

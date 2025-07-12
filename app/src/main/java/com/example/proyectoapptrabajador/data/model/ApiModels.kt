@@ -111,10 +111,7 @@ data class TrabajadorDetalle(
     val reviews: List<Resena> // Usa la nueva clase Resena
 )
 
-// Petición para /workers/{id}/categories
-data class UpdateCategoriesRequest(
-    val categories: List<Int>
-)
+// Petición para /workers/{id}/categories (ELIMINADA DUPLICADA)
 
 // Respuesta de /client/register
 data class RegisterResponse(
@@ -129,11 +126,46 @@ data class RegisteredUser(
     val email: String
 )
 
+// Categoria/Category para trabajador
+data class Category(
+    val id: Int,
+    val name: String
+)
+
+// Para la respuesta de POST /worker/register
+data class WorkerRegisterResponse(
+    val id: Int,
+    val name: String,
+    val email: String,
+    val profile: Profile,
+    val worker: WorkerInfo
+)
+
+// Objeto anidado en WorkerRegisterResponse
 data class Profile(
     val id: Int,
     val name: String,
-    @SerializedName("last_name") val lastName: String,
+    val last_name: String,
     val type: Int
+)
+
+// Objeto anidado en WorkerRegisterResponse y respuesta de endpoints de perfil
+data class WorkerInfo(
+    val id: Int,
+    val user_id: Int,
+    val picture_url: String?,
+    val average_rating: String?,
+    val reviews_count: Int?,
+    val categories: List<Category>? = null // Para la respuesta de cambio de categorías
+)
+
+// Para la petición de POST /workers/{id}/categories
+data class UpdateCategoriesRequest(
+    val categories: List<CategoryId>
+)
+
+data class CategoryId(
+    val id: Int
 )
 
 data class ErrorResponse(

@@ -35,11 +35,10 @@ class LoginViewModel(private val repository: AppRepository) : ViewModel() {
     fun login(email: String, pass: String) {
         viewModelScope.launch {
             try {
-                val request = LoginRequest(email, pass)
-                val response = repository.loginWorker(request) // Cambiado a loginWorker
-                if (response.isSuccessful && response.body() != null) {
-                    val token = response.body()!!.accessToken
-                    repository.saveToken(token) // Guarda el token
+                val call = repository.loginWorker(email, pass)
+                if (call.isSuccessful && call.body() != null) {
+                    val token = call.body()!!.accessToken
+                    repository.saveToken(token)
                     _loginStatus.value = true
                 } else {
                     _errorMessage.value = "Credenciales inválidas"

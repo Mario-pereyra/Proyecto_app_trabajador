@@ -66,6 +66,15 @@ class ChatFragment : Fragment() {
         viewModel.fetchAppointmentDetails(args.appointmentId)
         viewModel.startPollingMessages(args.appointmentId)
 
+        val appointmentId = args.appointmentId
+        viewModel.startMessageRefresh(appointmentId)
+
+        viewModel.appointmentDetails.observe(viewLifecycleOwner) { cita ->
+            currentAppointment = cita
+            binding.btnConcretarCita.visibility = if (cita.status == 1) View.VISIBLE else View.GONE
+            binding.btnFinalizarTrabajo.visibility = if (cita.status == 2) View.VISIBLE else View.GONE
+        }
+
         Log.d("ChatFragment", "Abriendo chat para appointmentId: ${args.appointmentId}")
     }
 
@@ -285,6 +294,7 @@ class ChatFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.stopMessageRefresh()
         _binding = null
     }
 }
