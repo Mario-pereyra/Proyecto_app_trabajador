@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <!-- Login Fragment - Punto de inicio -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <!-- Flujo de Login: Login -> Mis Citas -->
+        <action
+            android:id="@+id/action_loginFragment_to_appointmentsFragment"
+            app:destination="@id/appointmentsFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <!-- Flujo de Registro: Login -> Register -->
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+    </fragment>
+
+    <!-- Register Fragment - Primer paso del registro -->
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.RegisterFragment"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register" >
+        <!-- Flujo de Registro: Register -> Selección de categorías -->
+        <action
+            android:id="@+id/action_registerFragment_to_selectCategoriesFragment"
+            app:destination="@id/selectCategoriesFragment" />
+        <!-- Volver al login -->
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <!-- Select Categories Fragment - Segundo paso del registro -->
+    <fragment
+        android:id="@+id/selectCategoriesFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.SelectCategoriesFragment"
+        android:label="fragment_select_categories"
+        tools:layout="@layout/fragment_select_categories" >
+        <!-- Flujo de Registro: Categorías -> Foto de perfil -->
+        <action
+            android:id="@+id/action_selectCategoriesFragment_to_profilePictureFragment"
+            app:destination="@id/profilePictureFragment" />
+    </fragment>
+
+    <!-- Profile Picture Fragment - Tercer paso del registro -->
+    <fragment
+        android:id="@+id/profilePictureFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.ProfilePictureFragment"
+        android:label="fragment_profile_picture"
+        tools:layout="@layout/fragment_profile_picture" >
+        <!-- Flujo de Registro: Foto -> Mis Citas (completar registro) -->
+        <action
+            android:id="@+id/action_profilePictureFragment_to_appointmentsFragment"
+            app:destination="@id/appointmentsFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Appointments Fragment - Pantalla principal del trabajador -->
+    <fragment
+        android:id="@+id/appointmentsFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.AppointmentsFragment"
+        android:label="fragment_appointments"
+        tools:layout="@layout/fragment_appointments" >
+        <!-- Desde Mis Citas: Appointments -> Chat -->
+        <action
+            android:id="@+id/action_appointmentsFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+        <!-- Desde Mis Citas: Appointments -> Editar Perfil -->
+        <action
+            android:id="@+id/action_appointmentsFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+        <!-- Desde Mis Citas: Appointments -> Mapa (para ver ubicación) -->
+        <action
+            android:id="@+id/action_appointmentsFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+
+    <!-- Chat Fragment - Chat con el cliente -->
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" >
+        <argument
+            android:name="appointmentId"
+            app:argType="integer" />
+        <!-- Desde Chat: Chat -> Mapa (para ver/confirmar ubicación) -->
+        <action
+            android:id="@+id/action_chatFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+
+    <!-- Map Fragment - Mostrar ubicación de la cita -->
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.MapFragment"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" >
+        <argument
+            android:name="appointmentId"
+            app:argType="integer" />
+        <argument
+            android:name="latitude"
+            app:argType="float" />
+        <argument
+            android:name="longitude"
+            app:argType="float" />
+    </fragment>
+
+    <!-- Edit Profile Fragment - Editar perfil del trabajador -->
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.EditProfileFragment"
+        android:label="fragment_edit_profile"
+        tools:layout="@layout/fragment_edit_profile" />
+
+</navigation>

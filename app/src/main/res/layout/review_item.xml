@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingVertical="8dp">
+
+    <TextView
+        android:id="@+id/txtReviewAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Autor de la Reseña"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/txtReviewComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Este es el comentario de la reseña, puede ser un poco largo."
+        android:layout_marginTop="4dp"/>
+</LinearLayout>
+
