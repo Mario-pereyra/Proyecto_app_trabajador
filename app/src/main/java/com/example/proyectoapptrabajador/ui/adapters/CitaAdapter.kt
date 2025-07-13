@@ -7,7 +7,9 @@ import com.example.proyectoapptrabajador.data.model.Cita
 import com.example.proyectoapptrabajador.databinding.ItemCitaBinding
 
 class CitaAdapter(
-    private val onCitaClick: (Cita) -> Unit
+    private val onCitaClick: (Cita) -> Unit,
+    private val onConfirmClick: (Cita) -> Unit,
+    private val onFinalizeClick: (Cita) -> Unit
 ) : RecyclerView.Adapter<CitaAdapter.CitaViewHolder>() {
 
     private var citas: List<Cita> = emptyList()
@@ -47,17 +49,50 @@ class CitaAdapter(
                 binding.tvHora.text = "Hora no definida"
             }
 
-            // Estado de la cita con colores
-            val (estadoTexto, colorFondo) = when (cita.status) {
-                0 -> "Pendiente" to "#FF9800" // Naranja
-                1 -> "Confirmada" to "#2196F3" // Azul
-                2 -> "En progreso" to "#4CAF50" // Verde
-                3 -> "Finalizada" to "#607D8B" // Gris azulado
-                else -> "Estado desconocido" to "#757575" // Gris
+            // Estado de la cita con colores y acciones
+            when (cita.status) {
+                0 -> {
+                    binding.tvEstado.text = "Pendiente"
+                    binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#FF9800"))
+                    // Mostrar botón de confirmación para citas pendientes
+                    binding.btnConfirmar.visibility = android.view.View.VISIBLE
+                    binding.btnFinalizar.visibility = android.view.View.GONE
+                }
+                1 -> {
+                    binding.tvEstado.text = "Confirmada"
+                    binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#2196F3"))
+                    binding.btnConfirmar.visibility = android.view.View.GONE
+                    binding.btnFinalizar.visibility = android.view.View.GONE
+                }
+                2 -> {
+                    binding.tvEstado.text = "En progreso"
+                    binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#4CAF50"))
+                    // Mostrar botón de finalización para citas en progreso
+                    binding.btnConfirmar.visibility = android.view.View.GONE
+                    binding.btnFinalizar.visibility = android.view.View.VISIBLE
+                }
+                3 -> {
+                    binding.tvEstado.text = "Finalizada"
+                    binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#607D8B"))
+                    binding.btnConfirmar.visibility = android.view.View.GONE
+                    binding.btnFinalizar.visibility = android.view.View.GONE
+                }
+                else -> {
+                    binding.tvEstado.text = "Estado desconocido"
+                    binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#757575"))
+                    binding.btnConfirmar.visibility = android.view.View.GONE
+                    binding.btnFinalizar.visibility = android.view.View.GONE
+                }
             }
 
-            binding.tvEstado.text = estadoTexto
-            binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor(colorFondo))
+            // Click listeners para los botones de acción
+            binding.btnConfirmar.setOnClickListener {
+                onConfirmClick(cita)
+            }
+
+            binding.btnFinalizar.setOnClickListener {
+                onFinalizeClick(cita)
+            }
 
             binding.root.setOnClickListener {
                 onCitaClick(cita)

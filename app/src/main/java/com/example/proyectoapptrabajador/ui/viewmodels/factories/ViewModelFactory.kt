@@ -7,6 +7,7 @@ import com.example.proyectoapptrabajador.ui.viewmodels.LoginViewModel
 import com.example.proyectoapptrabajador.ui.viewmodels.WorkerRegisterViewModel
 import com.example.proyectoapptrabajador.ui.viewmodels.CitasViewModel
 import com.example.proyectoapptrabajador.ui.viewmodels.ChatViewModel
+import com.example.proyectoapptrabajador.ui.viewmodels.AppointmentDialogViewModel
 
 class ViewModelFactory(private val repository: AppRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -25,6 +26,10 @@ class ViewModelFactory(private val repository: AppRepository) : ViewModelProvide
         if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return ChatViewModel(repository) as T
+        }
+        if (modelClass.isAssignableFrom(AppointmentDialogViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AppointmentDialogViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

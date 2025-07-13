@@ -66,6 +66,37 @@
             android:textColor="@android:color/white"
             android:textSize="12sp" />
 
+        <!-- Botones de acción -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <ImageButton
+                android:id="@+id/btnConfirmar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_button_confirm"
+                android:contentDescription="Confirmar cita"
+                android:src="@drawable/ic_check"
+                android:tint="@android:color/white"
+                android:visibility="gone"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/btnFinalizar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_button_finalize"
+                android:contentDescription="Finalizar trabajo"
+                android:src="@drawable/ic_done_all"
+                android:tint="@android:color/white"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

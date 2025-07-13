@@ -94,6 +94,12 @@
         <action
             android:id="@+id/action_misCitasFragment_to_homeTrabajadorFragment"
             app:destination="@id/homeTrabajadorFragment" />
+        <action
+            android:id="@+id/action_misCitasFragment_to_confirmAppointmentDialog"
+            app:destination="@id/confirmAppointmentDialog" />
+        <action
+            android:id="@+id/action_misCitasFragment_to_finalizeAppointmentDialog"
+            app:destination="@id/finalizeAppointmentDialog" />
     </fragment>
 
     <fragment
@@ -123,5 +129,29 @@
         android:name="com.example.proyectoapptrabajador.ui.fragments.EditarPerfilFragment"
         android:label="EditarPerfilFragment"
         tools:layout="@layout/fragment_editar_perfil" />
+
+    <!-- Diálogos de confirmación y finalización -->
+    <dialog
+        android:id="@+id/confirmAppointmentDialog"
+        android:name="com.example.proyectoapptrabajador.ui.dialogs.ConfirmAppointmentDialog"
+        android:label="ConfirmAppointmentDialog"
+        tools:layout="@layout/dialog_confirm_appointment">
+        <argument
+            android:name="appointmentId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_confirmAppointmentDialog_to_mapaFragment"
+            app:destination="@id/mapaFragment" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/finalizeAppointmentDialog"
+        android:name="com.example.proyectoapptrabajador.ui.dialogs.FinalizeAppointmentDialog"
+        android:label="FinalizeAppointmentDialog"
+        tools:layout="@layout/dialog_finalize_appointment">
+        <argument
+            android:name="appointmentId"
+            app:argType="integer" />
+    </dialog>
 
 </navigation>

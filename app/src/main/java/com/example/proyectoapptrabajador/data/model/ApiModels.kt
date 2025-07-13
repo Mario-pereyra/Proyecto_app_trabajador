@@ -133,6 +133,17 @@ data class ChatUser(
 
 data class MensajeChatRequest(val message: String, val receiver_id: Int)
 
+// Modelos para confirmación y finalización de citas
+data class ConfirmAppointmentRequest(
+    val worker_id: String,
+    val category_selected_id: Int
+)
+
+data class FinalizeAppointmentRequest(
+    val worker_id: String,
+    val category_selected_id: Int
+)
+
 // Respuesta del endpoint GET /me
 data class MeResponse(
     val id: Int,

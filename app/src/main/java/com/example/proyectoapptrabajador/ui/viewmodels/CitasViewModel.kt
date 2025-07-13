@@ -46,13 +46,46 @@ class CitasViewModel(private val repository: AppRepository) : ViewModel() {
     fun confirmCita(citaId: Int) {
         viewModelScope.launch {
             try {
-                val response = repository.confirmCita(citaId)
+                // Primero obtenemos los detalles de la cita para obtener el categoryId
+                val citaResponse = repository.getAppointmentDetails(citaId)
+                if (!citaResponse.isSuccessful) {
+                    Log.e("CitasViewModel", "Error al obtener detalles de cita: ${citaResponse.code()}")
+                    _errorMessage.value = "Error al obtener información de la cita"
+                    return@launch
+                }
+
+                val cita = citaResponse.body()
+                if (cita == null) {
+                    _errorMessage.value = "No se pudo obtener información de la cita"
+                    return@launch
+                }
+
+                // Obtenemos el workerId usando GET /me
+                val meResponse = repository.getMe()
+                if (!meResponse.isSuccessful) {
+                    Log.e("CitasViewModel", "Error al obtener información del trabajador: ${meResponse.code()}")
+                    _errorMessage.value = "Error al obtener información del trabajador"
+                    return@launch
+                }
+
+                val workerId = meResponse.body()?.worker?.id?.toString()
+                if (workerId == null) {
+                    _errorMessage.value = "ID del trabajador no encontrado"
+                    return@launch
+                }
+
+                Log.d("CitasViewModel", "Confirmando cita $citaId con workerId: $workerId, categoryId: ${cita.category_selected_id}")
+
+                // Ahora confirmamos la cita con los parámetros correctos
+                val response = repository.confirmCita(citaId, workerId, cita.category_selected_id)
                 if (response.isSuccessful) {
                     Log.d("CitasViewModel", "Cita confirmada: $citaId")
                     loadCitas() // Recargar las citas
                 } else {
+                    val errorBody = response.errorBody()?.string()
                     Log.e("CitasViewModel", "Error al confirmar cita: ${response.code()}")
-                    _errorMessage.value = "Error al confirmar la cita"
+                    Log.e("CitasViewModel", "Error body: $errorBody")
+                    _errorMessage.value = "Error al confirmar la cita: ${response.code()}"
                 }
             } catch (e: Exception) {
                 Log.e("CitasViewModel", "Excepción al confirmar cita", e)

@@ -107,9 +107,11 @@ class AppRepository(
 
     suspend fun getCitas() = apiClient.getAppointments()
 
-    suspend fun confirmCita(citaId: Int) = apiClient.confirmAppointment(citaId)
+    suspend fun confirmCita(citaId: Int, workerId: String, categoryId: Int) =
+        apiClient.confirmAppointment(citaId, ConfirmAppointmentRequest(workerId, categoryId))
 
-    suspend fun finalizeCita(citaId: Int) = apiClient.finalizeAppointment(citaId)
+    suspend fun finalizeCita(citaId: Int, workerId: String, categoryId: Int) =
+        apiClient.finalizeAppointment(citaId, FinalizeAppointmentRequest(workerId, categoryId))
 
     suspend fun getMe() = apiClient.getMe()
 

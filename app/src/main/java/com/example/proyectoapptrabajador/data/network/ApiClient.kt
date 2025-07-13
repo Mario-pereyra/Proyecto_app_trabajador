@@ -27,10 +27,10 @@ interface ApiClient {
     suspend fun getAppointmentDetails(@Path("id") id: Int): Response<Cita>
 
     @POST("appointments/{id}/confirm")
-    suspend fun confirmAppointment(@Path("id") id: Int): Response<Cita>
+    suspend fun confirmAppointment(@Path("id") id: Int, @Body request: ConfirmAppointmentRequest): Response<Cita>
 
     @POST("appointments/{id}/finalize")
-    suspend fun finalizeAppointment(@Path("id") id: Int): Response<Cita>
+    suspend fun finalizeAppointment(@Path("id") id: Int, @Body request: FinalizeAppointmentRequest): Response<Cita>
 
     @GET("appointments/{id}/chats")
     suspend fun getChatMessages(@Path("id") appointmentId: Int): Response<List<MensajeChat>>

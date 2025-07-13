@@ -54,11 +54,23 @@ class MisCitasFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        citaAdapter = CitaAdapter { cita ->
-            // Navegar al chat de la cita seleccionada
-            val action = MisCitasFragmentDirections.actionMisCitasFragmentToChatFragment(cita.id)
-            findNavController().navigate(action)
-        }
+        citaAdapter = CitaAdapter(
+            onCitaClick = { cita ->
+                // Navegar al chat de la cita seleccionada
+                val action = MisCitasFragmentDirections.actionMisCitasFragmentToChatFragment(cita.id)
+                findNavController().navigate(action)
+            },
+            onConfirmClick = { cita ->
+                // Mostrar popup de confirmación
+                val action = MisCitasFragmentDirections.actionMisCitasFragmentToConfirmAppointmentDialog(cita.id)
+                findNavController().navigate(action)
+            },
+            onFinalizeClick = { cita ->
+                // Mostrar popup de finalización
+                val action = MisCitasFragmentDirections.actionMisCitasFragmentToFinalizeAppointmentDialog(cita.id)
+                findNavController().navigate(action)
+            }
+        )
 
         binding.rvCitas.apply {
             layoutManager = LinearLayoutManager(context)

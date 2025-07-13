@@ -127,4 +127,49 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Botones -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/inputLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/btnCancelar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_button_secondary"
+            android:text="Cancelar"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnFinalizar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_button_primary"
+            android:text="✓ Finalizar"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <!-- Botón de finalizar trabajo en el chat (cuando está en progreso) -->
+    <ImageButton
+        android:id="@+id/btnFinalizarTrabajo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_button_finalize"
+        android:contentDescription="Finalizar trabajo"
+        android:src="@drawable/ic_done_all"
+        android:tint="@android:color/white"
+        android:visibility="gone" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
