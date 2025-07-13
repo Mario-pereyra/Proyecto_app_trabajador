@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.proyectoapptrabajador.repositories.AppRepository
 import com.example.proyectoapptrabajador.ui.viewmodels.LoginViewModel
 import com.example.proyectoapptrabajador.ui.viewmodels.WorkerRegisterViewModel
+import com.example.proyectoapptrabajador.ui.viewmodels.CitasViewModel
 
 class ViewModelFactory(private val repository: AppRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -12,10 +13,13 @@ class ViewModelFactory(private val repository: AppRepository) : ViewModelProvide
             @Suppress("UNCHECKED_CAST")
             return LoginViewModel(repository) as T
         }
-        // --- NUEVO VIEWMODEL AÑADIDO ---
         if (modelClass.isAssignableFrom(WorkerRegisterViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return WorkerRegisterViewModel(repository) as T
+        }
+        if (modelClass.isAssignableFrom(CitasViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return CitasViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

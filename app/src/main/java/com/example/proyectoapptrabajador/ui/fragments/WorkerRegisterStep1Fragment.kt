@@ -1,6 +1,7 @@
 package com.example.proyectoapptrabajador.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +35,8 @@ class WorkerRegisterStep1Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupObservers()
+
         binding.btnSiguiente.setOnClickListener {
             val name = binding.etName.text.toString().trim()
             val lastName = binding.etLastName.text.toString().trim()
@@ -51,7 +54,36 @@ class WorkerRegisterStep1Fragment : Fragment() {
             registerViewModel.email.value = email
             registerViewModel.password.value = password
 
-            findNavController().navigate(R.id.action_workerRegisterStep1Fragment_to_workerRegisterStep2Fragment)
+            // Log del estado actual después de Pantalla 1
+            Log.d("WorkerRegisterStep1", "=== DATOS DESPUÉS DE PANTALLA 1 ===")
+            Log.d("WorkerRegisterStep1", "Name: ${registerViewModel.name.value}")
+            Log.d("WorkerRegisterStep1", "LastName: ${registerViewModel.lastName.value}")
+            Log.d("WorkerRegisterStep1", "Email: ${registerViewModel.email.value}")
+            Log.d("WorkerRegisterStep1", "Password: ${registerViewModel.password.value}")
+            Log.d("WorkerRegisterStep1", "ProfilePictureUri: ${registerViewModel.profilePictureUri.value}")
+            Log.d("WorkerRegisterStep1", "Selected Categories: ${registerViewModel.getSelectedCategoriesDebug()}")
+            Log.d("WorkerRegisterStep1", "==========================================")
+
+            // Realizar el registro básico
+            registerViewModel.registerWorkerBasicData()
+        }
+    }
+
+    private fun setupObservers() {
+        registerViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.btnSiguiente.isEnabled = !isLoading
+            binding.btnSiguiente.text = if (isLoading) "Registrando..." else "Siguiente"
+        }
+
+        registerViewModel.basicRegistrationResult.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Toast.makeText(context, "Registro exitoso. Ahora inicia sesión para completar tu perfil", Toast.LENGTH_LONG).show()
+                findNavController().navigate(R.id.action_workerRegisterStep1Fragment_to_loginFragment)
+            }
+        }
+
+        registerViewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 

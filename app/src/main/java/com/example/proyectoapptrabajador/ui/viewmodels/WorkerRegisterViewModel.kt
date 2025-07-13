@@ -2,6 +2,7 @@ package com.example.proyectoapptrabajador.ui.viewmodels
 
 import android.content.ContentResolver
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,56 +25,175 @@ class WorkerRegisterViewModel(private val repository: AppRepository) : ViewModel
     private val _categoriesList = MutableLiveData<List<Category>>()
     val categoriesList: LiveData<List<Category>> = _categoriesList
 
-    private val _registrationResult = MutableLiveData<Boolean>()
-    val registrationResult: LiveData<Boolean> = _registrationResult
+    private val _basicRegistrationResult = MutableLiveData<Boolean>()
+    val basicRegistrationResult: LiveData<Boolean> = _basicRegistrationResult
+
+    private val _photoUploadResult = MutableLiveData<Boolean>()
+    val photoUploadResult: LiveData<Boolean> = _photoUploadResult
+
+    private val _categoriesAssignResult = MutableLiveData<Boolean>()
+    val categoriesAssignResult: LiveData<Boolean> = _categoriesAssignResult
 
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
+
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
 
     // --- Lógica de negocio ---
     fun fetchCategories() {
         viewModelScope.launch {
             try {
                 val response = repository.getCategories()
-                _categoriesList.value = if (response.isSuccessful) response.body() else emptyList()
-            } catch (e: Exception) { _errorMessage.value = "Error de conexión" }
+                if (response.isSuccessful) {
+                    _categoriesList.value = response.body() ?: emptyList()
+                    Log.d("WorkerRegisterViewModel", "Categorías obtenidas: ${response.body()}")
+                } else {
+                    _categoriesList.value = emptyList()
+                    Log.e("WorkerRegisterViewModel", "Error al obtener categorías: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                _categoriesList.value = emptyList()
+                Log.e("WorkerRegisterViewModel", "Excepción al obtener categorías", e)
+                _errorMessage.value = "Error de conexión al obtener categorías"
+            }
         }
     }
 
     fun onCategorySelected(categoryId: Int, isChecked: Boolean) {
         val currentSelection = _selectedCategories.value?.toMutableSet() ?: mutableSetOf()
-        if (isChecked) currentSelection.add(categoryId) else currentSelection.remove(categoryId)
+        if (isChecked) {
+            currentSelection.add(categoryId)
+        } else {
+            currentSelection.remove(categoryId)
+        }
         _selectedCategories.value = currentSelection
+        Log.d("WorkerRegisterViewModel", "Categoría $categoryId ${if (isChecked) "seleccionada" else "deseleccionada"}. Total: ${currentSelection.size}")
     }
 
     fun isCategorySelected(categoryId: Int): Boolean {
         return _selectedCategories.value?.contains(categoryId) ?: false
     }
 
-    fun registerWorker(contentResolver: ContentResolver) {
-        val pictureUri = profilePictureUri.value
-        val categories = _selectedCategories.value
-        if (name.value.isNullOrBlank() || lastName.value.isNullOrBlank() || email.value.isNullOrBlank() || password.value.isNullOrBlank() || pictureUri == null || categories.isNullOrEmpty()) {
+    fun getSelectedCategoriesDebug(): String {
+        val categories = _selectedCategories.value ?: emptySet()
+        return if (categories.isEmpty()) {
+            "Ninguna categoría seleccionada"
+        } else {
+            "IDs: ${categories.joinToString(", ")} (Total: ${categories.size})"
+        }
+    }
+
+    // PASO 1: Registro básico de datos personales
+    fun registerWorkerBasicData() {
+        if (name.value.isNullOrBlank() || lastName.value.isNullOrBlank() ||
+            email.value.isNullOrBlank() || password.value.isNullOrBlank()) {
             _errorMessage.value = "Todos los campos son obligatorios"
             return
         }
 
+        Log.d("WorkerRegisterViewModel", "Iniciando registro básico con datos: " +
+            "name=${name.value}, lastName=${lastName.value}, email=${email.value}")
+
+        _isLoading.value = true
+
         viewModelScope.launch {
             try {
-                val response = repository.registerWorker(name.value!!, lastName.value!!, email.value!!, password.value!!, categories, pictureUri, contentResolver)
-                if (response.isSuccessful) {
-                    val accessToken = response.body()?.let { "12345|faketoken" } // La API de registro no devuelve token, simulamos uno para el login automático.
-                    if (accessToken != null) {
-                        repository.saveToken(accessToken)
-                        _registrationResult.postValue(true)
-                    }
-                } else {
-                    _errorMessage.postValue("Error en el registro: ${response.code()}")
-                    _registrationResult.postValue(false)
+                val registerResponse = repository.registerWorkerStep1(
+                    name.value!!,
+                    lastName.value!!,
+                    email.value!!,
+                    password.value!!
+                )
+
+                if (!registerResponse.isSuccessful) {
+                    Log.e("WorkerRegisterViewModel", "Error en registro básico: ${registerResponse.code()}")
+                    _errorMessage.postValue("Error en el registro: ${registerResponse.code()}")
+                    _isLoading.value = false
+                    return@launch
                 }
+
+                Log.d("WorkerRegisterViewModel", "Registro básico completado")
+                _basicRegistrationResult.postValue(true)
+                _isLoading.value = false
+
             } catch (e: Exception) {
+                Log.e("WorkerRegisterViewModel", "Excepción durante el registro básico", e)
                 _errorMessage.postValue("Error de conexión: ${e.message}")
-                _registrationResult.postValue(false)
+                _basicRegistrationResult.postValue(false)
+                _isLoading.value = false
+            }
+        }
+    }
+
+    // PASO 2: Subir foto de perfil (requiere token)
+    fun uploadProfilePicture(contentResolver: ContentResolver) {
+        val pictureUri = profilePictureUri.value
+
+        if (pictureUri == null) {
+            _errorMessage.value = "Selecciona una foto de perfil"
+            return
+        }
+
+        Log.d("WorkerRegisterViewModel", "Subiendo foto de perfil...")
+        _isLoading.value = true
+
+        viewModelScope.launch {
+            try {
+                val uploadResponse = repository.uploadProfilePicture(pictureUri, contentResolver)
+
+                if (!uploadResponse.isSuccessful) {
+                    Log.e("WorkerRegisterViewModel", "Error al subir foto: ${uploadResponse.code()}")
+                    _errorMessage.postValue("Error al subir la foto: ${uploadResponse.code()}")
+                    _isLoading.value = false
+                    return@launch
+                }
+
+                Log.d("WorkerRegisterViewModel", "Foto subida exitosamente")
+                _photoUploadResult.postValue(true)
+                _isLoading.value = false
+
+            } catch (e: Exception) {
+                Log.e("WorkerRegisterViewModel", "Excepción al subir foto", e)
+                _errorMessage.postValue("Error de conexión: ${e.message}")
+                _photoUploadResult.postValue(false)
+                _isLoading.value = false
+            }
+        }
+    }
+
+    // PASO 3: Asignar categorías (requiere token)
+    fun assignCategories() {
+        val categories = _selectedCategories.value
+
+        if (categories.isNullOrEmpty()) {
+            _errorMessage.value = "Selecciona al menos una ocupación"
+            return
+        }
+
+        Log.d("WorkerRegisterViewModel", "Asignando categorías: ${categories.size}")
+        _isLoading.value = true
+
+        viewModelScope.launch {
+            try {
+                val categoriesResponse = repository.assignCategories(categories)
+
+                if (!categoriesResponse.isSuccessful) {
+                    Log.e("WorkerRegisterViewModel", "Error al asignar categorías: ${categoriesResponse.code()}")
+                    _errorMessage.postValue("Error al asignar categorías: ${categoriesResponse.code()}")
+                    _isLoading.value = false
+                    return@launch
+                }
+
+                Log.d("WorkerRegisterViewModel", "Categorías asignadas exitosamente: ${categoriesResponse.body()}")
+                _categoriesAssignResult.postValue(true)
+                _isLoading.value = false
+
+            } catch (e: Exception) {
+                Log.e("WorkerRegisterViewModel", "Excepción al asignar categorías", e)
+                _errorMessage.postValue("Error de conexión: ${e.message}")
+                _categoriesAssignResult.postValue(false)
+                _isLoading.value = false
             }
         }
     }

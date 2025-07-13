@@ -10,9 +10,15 @@ interface ApiClient {
     @POST("worker/login")
     suspend fun loginWorker(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
-    @Multipart
     @POST("worker/register")
-    suspend fun registerWorker(@PartMap params: Map<String, @JvmSuppressWildcards RequestBody>, @Part profilePicture: MultipartBody.Part): Response<WorkerRegisterResponse>
+    suspend fun registerWorker(@Body request: WorkerRegisterRequest): Response<WorkerRegisterResponse>
+
+    @Multipart
+    @POST("workers/profile-picture")
+    suspend fun uploadProfilePicture(@Part picture: MultipartBody.Part): Response<Void>
+
+    @POST("workers/{id}/categories")
+    suspend fun assignCategories(@Path("id") workerId: Int, @Body request: WorkerCategoriesRequest): Response<WorkerCategoriesResponse>
 
     @GET("appointments")
     suspend fun getAppointments(): Response<List<Cita>>
@@ -34,4 +40,7 @@ interface ApiClient {
 
     @GET("categories")
     suspend fun getCategories(): Response<List<Category>>
+
+    @GET("me")
+    suspend fun getMe(): Response<MeResponse>
 }

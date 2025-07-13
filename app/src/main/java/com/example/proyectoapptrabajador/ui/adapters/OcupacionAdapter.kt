@@ -35,21 +35,24 @@ class OcupacionAdapter(
         fun bind(category: Category) {
             binding.tvOcupacionNombre.text = category.name
 
-            // Quitamos el listener anterior para evitar llamadas infinitas al reciclar vistas
+            // Quitamos listeners anteriores para evitar conflictos
             binding.root.setOnClickListener(null)
             binding.cbOcupacion.setOnCheckedChangeListener(null)
 
             // Sincronizamos el estado del CheckBox
             binding.cbOcupacion.isChecked = isCategorySelected(category.id)
 
-            // Añadimos el nuevo listener
-            val listener = View.OnClickListener {
-                binding.cbOcupacion.isChecked = !binding.cbOcupacion.isChecked
-                onCategorySelected(category.id, binding.cbOcupacion.isChecked)
+            // Configuramos el click del CheckBox
+            binding.cbOcupacion.setOnCheckedChangeListener { _, isChecked ->
+                onCategorySelected(category.id, isChecked)
             }
 
-            binding.root.setOnClickListener(listener)
-            binding.cbOcupacion.setOnClickListener(listener)
+            // Configuramos el click del contenedor completo
+            binding.root.setOnClickListener {
+                val newState = !binding.cbOcupacion.isChecked
+                binding.cbOcupacion.isChecked = newState
+                onCategorySelected(category.id, newState)
+            }
         }
     }
 }

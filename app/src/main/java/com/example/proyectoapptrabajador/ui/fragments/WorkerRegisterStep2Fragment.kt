@@ -1,6 +1,7 @@
 package com.example.proyectoapptrabajador.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,6 +43,8 @@ class WorkerRegisterStep2Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupObservers()
+
         binding.btnSeleccionarFoto.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
@@ -51,12 +54,42 @@ class WorkerRegisterStep2Fragment : Fragment() {
                 Toast.makeText(context, "Por favor, selecciona una foto de perfil", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            findNavController().navigate(R.id.action_workerRegisterStep2Fragment_to_workerRegisterStep3Fragment)
+
+            // Log del estado actual después de Pantalla 2
+            Log.d("WorkerRegisterStep2", "=== DATOS DESPUÉS DE PANTALLA 2 ===")
+            Log.d("WorkerRegisterStep2", "Name: ${registerViewModel.name.value}")
+            Log.d("WorkerRegisterStep2", "LastName: ${registerViewModel.lastName.value}")
+            Log.d("WorkerRegisterStep2", "Email: ${registerViewModel.email.value}")
+            Log.d("WorkerRegisterStep2", "Password: ${registerViewModel.password.value}")
+            Log.d("WorkerRegisterStep2", "ProfilePictureUri: ${registerViewModel.profilePictureUri.value}")
+            Log.d("WorkerRegisterStep2", "Selected Categories: ${registerViewModel.getSelectedCategoriesDebug()}")
+            Log.d("WorkerRegisterStep2", "==========================================")
+
+            // Subir foto de perfil con token
+            registerViewModel.uploadProfilePicture(requireActivity().contentResolver)
         }
 
         // Si el usuario vuelve atrás, mostramos la foto que ya había seleccionado
         registerViewModel.profilePictureUri.observe(viewLifecycleOwner) { uri ->
             uri?.let { binding.ivProfile.setImageURI(it) }
+        }
+    }
+
+    private fun setupObservers() {
+        registerViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.btnSiguiente.isEnabled = !isLoading
+            binding.btnSiguiente.text = if (isLoading) "Subiendo foto..." else "Siguiente"
+        }
+
+        registerViewModel.photoUploadResult.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Toast.makeText(context, "Foto actualizada exitosamente", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_workerRegisterStep2Fragment_to_homeTrabajadorFragment)
+            }
+        }
+
+        registerViewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 

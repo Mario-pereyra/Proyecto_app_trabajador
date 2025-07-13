@@ -1,6 +1,7 @@
 package com.example.proyectoapptrabajador.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +43,18 @@ class WorkerRegisterStep3Fragment : Fragment() {
         registerViewModel.fetchCategories()
 
         binding.btnFinalizarRegistro.setOnClickListener {
-            registerViewModel.registerWorker(requireActivity().contentResolver)
+            // Log del estado final antes de hacer las peticiones
+            Log.d("WorkerRegisterStep3", "=== DATOS FINALES ANTES DE PETICIONES ===")
+            Log.d("WorkerRegisterStep3", "Name: ${registerViewModel.name.value}")
+            Log.d("WorkerRegisterStep3", "LastName: ${registerViewModel.lastName.value}")
+            Log.d("WorkerRegisterStep3", "Email: ${registerViewModel.email.value}")
+            Log.d("WorkerRegisterStep3", "Password: ${registerViewModel.password.value}")
+            Log.d("WorkerRegisterStep3", "ProfilePictureUri: ${registerViewModel.profilePictureUri.value}")
+            Log.d("WorkerRegisterStep3", "Selected Categories: ${registerViewModel.getSelectedCategoriesDebug()}")
+            Log.d("WorkerRegisterStep3", "==========================================")
+
+            // Asignar categorías con token
+            registerViewModel.assignCategories()
         }
     }
 
@@ -60,10 +72,15 @@ class WorkerRegisterStep3Fragment : Fragment() {
             ocupacionAdapter.updateData(categories)
         }
 
-        registerViewModel.registrationResult.observe(viewLifecycleOwner) { success ->
+        registerViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.btnFinalizarRegistro.isEnabled = !isLoading
+            binding.btnFinalizarRegistro.text = if (isLoading) "Asignando categorías..." else "Finalizar Registro"
+        }
+
+        registerViewModel.categoriesAssignResult.observe(viewLifecycleOwner) { success ->
             if (success) {
-                Toast.makeText(context, "¡Registro exitoso!", Toast.LENGTH_LONG).show()
-                findNavController().navigate(R.id.action_workerRegisterStep3Fragment_to_misCitasFragment)
+                Toast.makeText(context, "¡Ocupaciones actualizadas exitosamente!", Toast.LENGTH_LONG).show()
+                findNavController().navigate(R.id.action_workerRegisterStep3Fragment_to_homeTrabajadorFragment)
             }
         }
 

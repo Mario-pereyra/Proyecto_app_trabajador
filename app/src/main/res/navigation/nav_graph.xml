@@ -18,8 +18,58 @@
         <action
             android:id="@+id/action_loginFragment_to_register_flow"
             app:destination="@id/register_flow" />
+        <action
+            android:id="@+id/action_loginFragment_to_homeTrabajadorFragment"
+            app:destination="@id/homeTrabajadorFragment" />
     </fragment>
 
+    <!-- Pantalla principal del trabajador (menú de opciones) -->
+    <fragment
+        android:id="@+id/homeTrabajadorFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.HomeTrabajadorFragment"
+        android:label="HomeTrabajadorFragment"
+        tools:layout="@layout/fragment_home_trabajador">
+        <action
+            android:id="@+id/action_homeTrabajadorFragment_to_misCitasFragment"
+            app:destination="@id/misCitasFragment" />
+        <action
+            android:id="@+id/action_homeTrabajadorFragment_to_workerRegisterStep2Fragment"
+            app:destination="@id/workerRegisterStep2Fragment" />
+        <action
+            android:id="@+id/action_homeTrabajadorFragment_to_workerRegisterStep3Fragment"
+            app:destination="@id/workerRegisterStep3Fragment" />
+    </fragment>
+
+    <!-- Fragments para completar perfil (después del login) -->
+    <fragment
+        android:id="@+id/workerRegisterStep2Fragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.WorkerRegisterStep2Fragment"
+        android:label="WorkerRegisterStep2Fragment"
+        tools:layout="@layout/fragment_worker_register_step2">
+        <action
+            android:id="@+id/action_workerRegisterStep2Fragment_to_workerRegisterStep3Fragment"
+            app:destination="@id/workerRegisterStep3Fragment" />
+        <action
+            android:id="@+id/action_workerRegisterStep2Fragment_to_homeTrabajadorFragment"
+            app:destination="@id/homeTrabajadorFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/workerRegisterStep3Fragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.WorkerRegisterStep3Fragment"
+        android:label="WorkerRegisterStep3Fragment"
+        tools:layout="@layout/fragment_worker_register_step3">
+        <action
+            android:id="@+id/action_workerRegisterStep3Fragment_to_misCitasFragment"
+            app:destination="@id/misCitasFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_workerRegisterStep3Fragment_to_homeTrabajadorFragment"
+            app:destination="@id/homeTrabajadorFragment" />
+    </fragment>
+
+    <!-- Flujo de registro inicial (solo datos básicos) -->
     <navigation android:id="@+id/register_flow"
         app:startDestination="@id/workerRegisterStep1Fragment">
         <fragment
@@ -28,42 +78,22 @@
             android:label="WorkerRegisterStep1Fragment"
             tools:layout="@layout/fragment_worker_register_step1">
             <action
-                android:id="@+id/action_workerRegisterStep1Fragment_to_workerRegisterStep2Fragment"
-                app:destination="@id/workerRegisterStep2Fragment" />
-        </fragment>
-        <fragment
-            android:id="@+id/workerRegisterStep2Fragment"
-            android:name="com.example.proyectoapptrabajador.ui.fragments.WorkerRegisterStep2Fragment"
-            android:label="WorkerRegisterStep2Fragment"
-            tools:layout="@layout/fragment_worker_register_step2">
-            <action
-                android:id="@+id/action_workerRegisterStep2Fragment_to_workerRegisterStep3Fragment"
-                app:destination="@id/workerRegisterStep3Fragment" />
-        </fragment>
-        <fragment
-            android:id="@+id/workerRegisterStep3Fragment"
-            android:name=".ui.fragments.WorkerRegisterStep3Fragment"
-            android:label="WorkerRegisterStep3Fragment"
-            tools:layout="@layout/fragment_worker_register_step3">
-            <action
-                android:id="@+id/action_workerRegisterStep3Fragment_to_misCitasFragment"
-                app:destination="@id/misCitasFragment"
-                app:popUpTo="@id/nav_graph"
-                app:popUpToInclusive="true" />
+                android:id="@+id/action_workerRegisterStep1Fragment_to_loginFragment"
+                app:destination="@id/loginFragment" />
         </fragment>
     </navigation>
 
     <fragment
         android:id="@+id/misCitasFragment"
-        android:name=".ui.fragments.MisCitasFragment"
+        android:name="com.example.proyectoapptrabajador.ui.fragments.MisCitasFragment"
         android:label="MisCitasFragment"
         tools:layout="@layout/fragment_mis_citas">
         <action
             android:id="@+id/action_misCitasFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
         <action
-            android:id="@+id/action_misCitasFragment_to_editarPerfilFragment"
-            app:destination="@id/editarPerfilFragment" />
+            android:id="@+id/action_misCitasFragment_to_homeTrabajadorFragment"
+            app:destination="@id/homeTrabajadorFragment" />
     </fragment>
 
     <fragment

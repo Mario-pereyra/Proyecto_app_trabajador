@@ -53,13 +53,18 @@ class LoginFragment : Fragment() {
     private fun setupObservers() {
         viewModel.loginResult.observe(viewLifecycleOwner) { success ->
             if (success) {
-                Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_loginFragment_to_misCitasFragment)
+                Toast.makeText(context, "¡Sesión iniciada correctamente!", Toast.LENGTH_SHORT).show()
+                // Después del login exitoso, redirigir a HomeTrabajador
+                findNavController().navigate(R.id.action_loginFragment_to_homeTrabajadorFragment)
             }
         }
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        }
+
+        viewModel.successMessage.observe(viewLifecycleOwner) { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 
