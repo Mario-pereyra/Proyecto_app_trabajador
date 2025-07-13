@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.proyectoapptrabajador.R
 import com.example.proyectoapptrabajador.databinding.FragmentLoginBinding
 import com.example.proyectoapptrabajador.ui.activities.MainActivity
 import com.example.proyectoapptrabajador.ui.viewmodels.LoginViewModel
@@ -18,7 +19,7 @@ class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    // Inyectamos el ViewModel usando nuestra Factory
+    // Inyectamos el repositorio usando la Factory
     private val viewModel: LoginViewModel by viewModels {
         ViewModelFactory(MainActivity.repository)
     }
@@ -33,50 +34,32 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Primero, verificamos si ya hay una sesión activa
-        viewModel.checkSession()
-
-        setupObservers()
         setupEventListeners()
-    }
-
-    private fun setupObservers() {
-        // Observador para la sesión automática
-        viewModel.sessionStatus.observe(viewLifecycleOwner) { hasSession ->
-            if (hasSession) {
-                findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToCategoriesFragment())
-            }
-        }
-
-        // Observador para el resultado del login manual
-        viewModel.loginStatus.observe(viewLifecycleOwner) { isLoggedIn ->
-            if (isLoggedIn) {
-                findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToCategoriesFragment())
-            }
-        }
-
-        // Observador para los mensajes de error
-        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
-            if (!message.isNullOrEmpty()) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-            }
-        }
+        setupObservers()
     }
 
     private fun setupEventListeners() {
         binding.btnLogin.setOnClickListener {
-            val email = binding.txtEmail.text.toString()
-            val password = binding.txtPassword.text.toString()
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                viewModel.login(email, password)
-            } else {
-                Toast.makeText(requireContext(), "Por favor, ingrese email y contraseña", Toast.LENGTH_SHORT).show()
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
+            viewModel.iniciarSesion(email, password)
+        }
+
+        binding.tvRegistro.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_register_flow)
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.loginResult.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_loginFragment_to_misCitasFragment)
             }
         }
 
-        binding.lblRegistro.setOnClickListener {
-            findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
     }
 

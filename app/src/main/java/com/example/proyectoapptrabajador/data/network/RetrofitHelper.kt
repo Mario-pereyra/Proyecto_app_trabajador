@@ -8,10 +8,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitHelper {
     private const val BASE_URL = "http://trabajos.jmacboy.com/api/"
 
-    // La función ahora necesita el Contexto de la aplicación para crear el interceptor
     fun getInstance(context: Context): ApiClient {
         val client = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(context.applicationContext))
+            .addInterceptor(AuthInterceptor(context))
             .build()
 
         val retrofit = Retrofit.Builder()

@@ -8,20 +8,16 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 class AuthInterceptor(context: Context) : Interceptor {
-    private val tokenDataStore = TokenDataStore(context)
+    private val tokenDataStore = TokenDataStore(context.applicationContext)
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val token = runBlocking {
-            tokenDataStore.getToken().first()
+            tokenDataStore.getToken.first()
         }
-        val request = if (!token.isNullOrBlank()) {
-            chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
-                .build()
-        } else {
-            chain.request()
+        val request = chain.request().newBuilder()
+        if (!token.isNullOrBlank()) {
+            request.addHeader("Authorization", "Bearer $token")
         }
-        return chain.proceed(request)
+        return chain.proceed(request.build())
     }
 }
-
