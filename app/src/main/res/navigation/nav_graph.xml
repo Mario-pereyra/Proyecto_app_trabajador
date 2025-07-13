@@ -100,6 +100,9 @@
         <action
             android:id="@+id/action_misCitasFragment_to_finalizeAppointmentDialog"
             app:destination="@id/finalizeAppointmentDialog" />
+        <action
+            android:id="@+id/action_misCitasFragment_to_mapaFragment"
+            app:destination="@id/mapaFragment" />
     </fragment>
 
     <fragment
@@ -113,6 +116,12 @@
         <action
             android:id="@+id/action_chatFragment_to_mapaFragment"
             app:destination="@id/mapaFragment" />
+        <action
+            android:id="@+id/action_chatFragment_to_confirmAppointmentDialog"
+            app:destination="@id/confirmAppointmentDialog" />
+        <action
+            android:id="@+id/action_chatFragment_to_finalizeAppointmentDialog"
+            app:destination="@id/finalizeAppointmentDialog" />
     </fragment>
 
     <fragment
@@ -120,8 +129,8 @@
         android:name="com.example.proyectoapptrabajador.ui.fragments.MapaFragment"
         android:label="MapaFragment"
         tools:layout="@layout/fragment_mapa">
-        <argument android:name="latitud" app:argType="string" />
-        <argument android:name="longitud" app:argType="string" />
+        <argument android:name="latitude" app:argType="string" />
+        <argument android:name="longitude" app:argType="string" />
     </fragment>
 
     <fragment

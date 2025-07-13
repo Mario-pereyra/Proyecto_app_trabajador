@@ -9,7 +9,8 @@ import com.example.proyectoapptrabajador.databinding.ItemCitaBinding
 class CitaAdapter(
     private val onCitaClick: (Cita) -> Unit,
     private val onConfirmClick: (Cita) -> Unit,
-    private val onFinalizeClick: (Cita) -> Unit
+    private val onFinalizeClick: (Cita) -> Unit,
+    private val onViewLocationClick: (Cita) -> Unit // Nuevo callback para ver ubicación
 ) : RecyclerView.Adapter<CitaAdapter.CitaViewHolder>() {
 
     private var citas: List<Cita> = emptyList()
@@ -54,38 +55,48 @@ class CitaAdapter(
                 0 -> {
                     binding.tvEstado.text = "Pendiente"
                     binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#FF9800"))
-                    // Mostrar botón de confirmación para citas pendientes
-                    binding.btnConfirmar.visibility = android.view.View.VISIBLE
+                    // Solo chat para citas pendientes
+                    binding.btnConfirmar.visibility = android.view.View.GONE
                     binding.btnFinalizar.visibility = android.view.View.GONE
                 }
                 1 -> {
-                    binding.tvEstado.text = "Confirmada"
+                    binding.tvEstado.text = "Solicitada"
                     binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#2196F3"))
+                    // Chat + opción de concretar para citas solicitadas
                     binding.btnConfirmar.visibility = android.view.View.GONE
                     binding.btnFinalizar.visibility = android.view.View.GONE
                 }
                 2 -> {
-                    binding.tvEstado.text = "En progreso"
+                    binding.tvEstado.text = "Aceptada"
                     binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#4CAF50"))
-                    // Mostrar botón de finalización para citas en progreso
+                    // Mostrar botón para ver ubicación de cita aceptada
                     binding.btnConfirmar.visibility = android.view.View.GONE
-                    binding.btnFinalizar.visibility = android.view.View.VISIBLE
+                    binding.btnFinalizar.visibility = android.view.View.GONE
+                    if (cita.latitude != null && cita.longitude != null) {
+                        binding.btnVerUbicacion.visibility = android.view.View.VISIBLE
+                    }
                 }
                 3 -> {
                     binding.tvEstado.text = "Finalizada"
                     binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#607D8B"))
                     binding.btnConfirmar.visibility = android.view.View.GONE
                     binding.btnFinalizar.visibility = android.view.View.GONE
+                    binding.btnVerUbicacion.visibility = android.view.View.GONE
                 }
                 else -> {
                     binding.tvEstado.text = "Estado desconocido"
                     binding.tvEstado.setBackgroundColor(android.graphics.Color.parseColor("#757575"))
                     binding.btnConfirmar.visibility = android.view.View.GONE
                     binding.btnFinalizar.visibility = android.view.View.GONE
+                    binding.btnVerUbicacion.visibility = android.view.View.GONE
                 }
             }
 
             // Click listeners para los botones de acción
+            binding.btnVerUbicacion.setOnClickListener {
+                onViewLocationClick(cita)
+            }
+
             binding.btnConfirmar.setOnClickListener {
                 onConfirmClick(cita)
             }

@@ -69,6 +69,17 @@ class MisCitasFragment : Fragment() {
                 // Mostrar popup de finalización
                 val action = MisCitasFragmentDirections.actionMisCitasFragmentToFinalizeAppointmentDialog(cita.id)
                 findNavController().navigate(action)
+            },
+            onViewLocationClick = { cita ->
+                // Navegar al mapa para ver ubicación de cita aceptada
+                if (cita.latitude != null && cita.longitude != null) {
+                    val action = MisCitasFragmentDirections.actionMisCitasFragmentToMapaFragment(
+                        cita.latitude, cita.longitude
+                    )
+                    findNavController().navigate(action)
+                } else {
+                    Toast.makeText(context, "No hay ubicación disponible", Toast.LENGTH_SHORT).show()
+                }
             }
         )
 

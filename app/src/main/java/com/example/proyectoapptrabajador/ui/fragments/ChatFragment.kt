@@ -89,6 +89,24 @@ class ChatFragment : Fragment() {
                 Toast.makeText(context, "No hay ubicación disponible para esta cita", Toast.LENGTH_SHORT).show()
             }
         }
+
+        // Botón concretar cita (para citas solicitadas - status 1)
+        binding.btnConcretarCita.setOnClickListener {
+            val citaDetails = chatViewModel.citaDetails.value
+            if (citaDetails != null) {
+                val action = ChatFragmentDirections.actionChatFragmentToConfirmAppointmentDialog(citaDetails.id)
+                findNavController().navigate(action)
+            }
+        }
+
+        // Botón finalizar trabajo (para citas aceptadas - status 2)
+        binding.btnFinalizarTrabajo.setOnClickListener {
+            val citaDetails = chatViewModel.citaDetails.value
+            if (citaDetails != null) {
+                val action = ChatFragmentDirections.actionChatFragmentToFinalizeAppointmentDialog(citaDetails.id)
+                findNavController().navigate(action)
+            }
+        }
     }
 
     private fun setupObservers() {
@@ -112,6 +130,25 @@ class ChatFragment : Fragment() {
                 View.VISIBLE
             } else {
                 View.GONE
+            }
+
+            // Mostrar botones según el estado de la cita
+            when (cita.status) {
+                1 -> {
+                    // Cita solicitada - mostrar botón de concretar
+                    binding.btnConcretarCita.visibility = View.VISIBLE
+                    binding.btnFinalizarTrabajo.visibility = View.GONE
+                }
+                2 -> {
+                    // Cita aceptada - mostrar botón de finalizar
+                    binding.btnConcretarCita.visibility = View.GONE
+                    binding.btnFinalizarTrabajo.visibility = View.VISIBLE
+                }
+                else -> {
+                    // Otros estados - ocultar ambos botones
+                    binding.btnConcretarCita.visibility = View.GONE
+                    binding.btnFinalizarTrabajo.visibility = View.GONE
+                }
             }
         }
 
