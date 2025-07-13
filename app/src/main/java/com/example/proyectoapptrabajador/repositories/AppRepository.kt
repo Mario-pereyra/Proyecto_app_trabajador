@@ -112,4 +112,11 @@ class AppRepository(
     suspend fun finalizeCita(citaId: Int) = apiClient.finalizeAppointment(citaId)
 
     suspend fun getMe() = apiClient.getMe()
+
+    suspend fun getChatMessages(appointmentId: Int) = apiClient.getChatMessages(appointmentId)
+
+    suspend fun sendChatMessage(appointmentId: Int, message: String, receiverId: Int) =
+        apiClient.sendChatMessage(appointmentId, MensajeChatRequest(message, receiverId))
+
+    suspend fun getAppointmentDetails(appointmentId: Int) = apiClient.getAppointmentDetails(appointmentId)
 }

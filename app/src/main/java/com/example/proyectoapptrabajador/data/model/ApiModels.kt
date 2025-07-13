@@ -100,8 +100,37 @@ data class ClientDetail(
 data class User(val id: Int, val name: String, val email: String, val profile: Profile)
 data class Category(val id: Int, val name: String)
 
-// Chat
-data class MensajeChat(val id: Int, val sender_id: Int, val message: String)
+// Chat - Actualizado para coincidir con la respuesta real de la API
+data class MensajeChat(
+    val id: Int,
+    val appointment_id: Int,
+    val sender_id: Int,
+    val receiver_id: Int,
+    val date_sent: String,
+    val message: String,
+    val appointment: ChatAppointment,
+    val sender: ChatUser,
+    val receiver: ChatUser
+)
+
+data class ChatAppointment(
+    val id: Int,
+    val worker_id: Int,
+    val user_id: Int,
+    val appointment_date: String?,
+    val appointment_time: String?,
+    val category_selected_id: Int,
+    val latitude: String?,
+    val longitude: String?,
+    val status: Int
+)
+
+data class ChatUser(
+    val id: Int,
+    val name: String,
+    val email: String
+)
+
 data class MensajeChatRequest(val message: String, val receiver_id: Int)
 
 // Respuesta del endpoint GET /me
