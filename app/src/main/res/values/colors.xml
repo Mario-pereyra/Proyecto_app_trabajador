@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF9800</color>
     <color name="colorSecondary">#4CAF50</color>
     <color name="colorDivider">#E0E0E0</color>
+    <color name="colorError">#F44336</color>
 </resources>

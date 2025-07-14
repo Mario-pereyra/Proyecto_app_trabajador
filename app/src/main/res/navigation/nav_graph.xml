@@ -38,6 +38,11 @@
         <action
             android:id="@+id/action_homeTrabajadorFragment_to_workerRegisterStep3Fragment"
             app:destination="@id/workerRegisterStep3Fragment" />
+        <action
+            android:id="@+id/action_homeTrabajadorFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <!-- Fragments para completar perfil (después del login) -->
