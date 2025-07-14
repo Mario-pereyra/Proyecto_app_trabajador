@@ -100,6 +100,10 @@ data class ClientDetail(
 data class User(val id: Int, val name: String, val email: String, val profile: Profile)
 data class Category(val id: Int, val name: String)
 
+// Modelos para agregar nueva categoría
+data class CreateCategoryRequest(val name: String)
+data class CreateCategoryResponse(val id: Int, val name: String)
+
 // Chat - Actualizado para coincidir con la respuesta real de la API
 data class MensajeChat(
     val id: Int,

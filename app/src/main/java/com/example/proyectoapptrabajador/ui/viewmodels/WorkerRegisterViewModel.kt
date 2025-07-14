@@ -49,13 +49,34 @@ class WorkerRegisterViewModel(private val repository: AppRepository) : ViewModel
                     _categoriesList.value = response.body() ?: emptyList()
                     Log.d("WorkerRegisterViewModel", "Categorías obtenidas: ${response.body()}")
                 } else {
-                    _categoriesList.value = emptyList()
+                    _errorMessage.value = "Error al cargar las ocupaciones"
                     Log.e("WorkerRegisterViewModel", "Error al obtener categorías: ${response.code()}")
                 }
             } catch (e: Exception) {
-                _categoriesList.value = emptyList()
+                _errorMessage.value = "Error de conexión al cargar ocupaciones"
                 Log.e("WorkerRegisterViewModel", "Excepción al obtener categorías", e)
-                _errorMessage.value = "Error de conexión al obtener categorías"
+            }
+        }
+    }
+
+    fun createCategory(name: String) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                val response = repository.createCategory(name)
+                if (response.isSuccessful) {
+                    Log.d("WorkerRegisterViewModel", "Categoría creada exitosamente: ${response.body()}")
+                    // Refrescar la lista de categorías después de crear una nueva
+                    fetchCategories()
+                } else {
+                    _errorMessage.value = "Error al crear la ocupación"
+                    Log.e("WorkerRegisterViewModel", "Error al crear categoría: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error de conexión al crear ocupación"
+                Log.e("WorkerRegisterViewModel", "Excepción al crear categoría", e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }

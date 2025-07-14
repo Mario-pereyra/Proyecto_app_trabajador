@@ -25,6 +25,8 @@ class AppRepository(
 
     suspend fun getCategories() = apiClient.getCategories()
 
+    suspend fun createCategory(name: String) = apiClient.createCategory(CreateCategoryRequest(name))
+
     // Registro secuencial en 3 pasos
     suspend fun registerWorkerStep1(
         name: String,

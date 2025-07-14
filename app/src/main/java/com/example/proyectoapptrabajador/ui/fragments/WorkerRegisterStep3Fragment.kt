@@ -42,6 +42,10 @@ class WorkerRegisterStep3Fragment : Fragment() {
 
         registerViewModel.fetchCategories()
 
+        binding.btnAgregarOcupacion.setOnClickListener {
+            showAddCategoryDialog()
+        }
+
         binding.btnFinalizarRegistro.setOnClickListener {
             // Log del estado final antes de hacer las peticiones
             Log.d("WorkerRegisterStep3", "=== DATOS FINALES ANTES DE PETICIONES ===")
@@ -87,6 +91,31 @@ class WorkerRegisterStep3Fragment : Fragment() {
         registerViewModel.errorMessage.observe(viewLifecycleOwner) { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showAddCategoryDialog() {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        val editText = android.widget.EditText(requireContext())
+        editText.hint = "Nombre de la ocupación"
+        editText.setPadding(50, 30, 50, 30)
+
+        builder.setTitle("Agregar nueva ocupación")
+        builder.setView(editText)
+
+        builder.setPositiveButton("Agregar") { _, _ ->
+            val categoryName = editText.text.toString().trim()
+            if (categoryName.isNotEmpty()) {
+                registerViewModel.createCategory(categoryName)
+            } else {
+                Toast.makeText(context, "Ingresa un nombre para la ocupación", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        builder.setNegativeButton("Cancelar") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        builder.show()
     }
 
     override fun onDestroyView() {

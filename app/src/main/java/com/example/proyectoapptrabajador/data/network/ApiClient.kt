@@ -41,6 +41,9 @@ interface ApiClient {
     @GET("categories")
     suspend fun getCategories(): Response<List<Category>>
 
+    @POST("categories")
+    suspend fun createCategory(@Body request: CreateCategoryRequest): Response<CreateCategoryResponse>
+
     @GET("me")
     suspend fun getMe(): Response<MeResponse>
 }
