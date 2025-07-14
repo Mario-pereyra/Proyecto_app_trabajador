@@ -134,15 +134,51 @@ class ChatFragment : Fragment() {
 
             // Mostrar botones según el estado de la cita
             when (cita.status) {
-                1 -> {
-                    // Cita solicitada - mostrar botón de concretar
-                    binding.btnConcretarCita.visibility = View.VISIBLE
+                0 -> {
+                    // Cita pendiente - solo chat disponible
+                    binding.btnConcretarCita.visibility = View.GONE
                     binding.btnFinalizarTrabajo.visibility = View.GONE
                 }
+                1 -> {
+                    // Cita solicitada - mostrar botón de concretar prominente
+                    binding.btnConcretarCita.visibility = View.VISIBLE
+                    binding.btnFinalizarTrabajo.visibility = View.GONE
+                    // Hacer el botón más visible con animación
+                    binding.btnConcretarCita.animate()
+                        .scaleX(1.1f)
+                        .scaleY(1.1f)
+                        .setDuration(200)
+                        .withEndAction {
+                            binding.btnConcretarCita.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(200)
+                                .start()
+                        }
+                        .start()
+                }
                 2 -> {
-                    // Cita aceptada - mostrar botón de finalizar
+                    // Cita concretada - mostrar botón de finalizar
                     binding.btnConcretarCita.visibility = View.GONE
                     binding.btnFinalizarTrabajo.visibility = View.VISIBLE
+                    // Hacer el botón más visible con animación
+                    binding.btnFinalizarTrabajo.animate()
+                        .scaleX(1.1f)
+                        .scaleY(1.1f)
+                        .setDuration(200)
+                        .withEndAction {
+                            binding.btnFinalizarTrabajo.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(200)
+                                .start()
+                        }
+                        .start()
+                }
+                3 -> {
+                    // Cita finalizada - ocultar todos los botones
+                    binding.btnConcretarCita.visibility = View.GONE
+                    binding.btnFinalizarTrabajo.visibility = View.GONE
                 }
                 else -> {
                     // Otros estados - ocultar ambos botones

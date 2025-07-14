@@ -29,14 +29,27 @@ class AppointmentDialogViewModel(private val repository: AppRepository) : ViewMo
     fun loadAppointmentDetails(appointmentId: Int) {
         viewModelScope.launch {
             try {
-                Log.d("AppointmentDialogViewModel", "Cargando detalles de la cita: $appointmentId")
+                Log.d("AppointmentDialogViewModel", "=== CARGANDO DETALLES DE CITA ===")
+                Log.d("AppointmentDialogViewModel", "Ejecutando GET /appointments/$appointmentId")
+
                 val response = repository.getAppointmentDetails(appointmentId)
 
                 if (response.isSuccessful) {
-                    _appointmentDetails.value = response.body()
-                    Log.d("AppointmentDialogViewModel", "Detalles cargados: ${response.body()}")
+                    val cita = response.body()
+                    _appointmentDetails.value = cita
+
+                    Log.d("AppointmentDialogViewModel", "Detalles cargados exitosamente:")
+                    Log.d("AppointmentDialogViewModel", "- ID: ${cita?.id}")
+                    Log.d("AppointmentDialogViewModel", "- Status: ${cita?.status}")
+                    Log.d("AppointmentDialogViewModel", "- Cliente: ${cita?.client?.name}")
+                    Log.d("AppointmentDialogViewModel", "- Latitude: ${cita?.latitude}")
+                    Log.d("AppointmentDialogViewModel", "- Longitude: ${cita?.longitude}")
+                    Log.d("AppointmentDialogViewModel", "- Fecha: ${cita?.appointment_date}")
+                    Log.d("AppointmentDialogViewModel", "- Hora: ${cita?.appointment_time}")
+                    Log.d("AppointmentDialogViewModel", "- Category ID: ${cita?.category_selected_id}")
+
                 } else {
-                    Log.e("AppointmentDialogViewModel", "Error al cargar detalles: ${response.code()}")
+                    Log.e("AppointmentDialogViewModel", "Error en GET /appointments/$appointmentId - Código: ${response.code()}")
                     _errorMessage.value = "Error al cargar información de la cita"
                 }
             } catch (e: Exception) {
@@ -57,9 +70,12 @@ class AppointmentDialogViewModel(private val repository: AppRepository) : ViewMo
 
         viewModelScope.launch {
             try {
+                Log.d("AppointmentDialogViewModel", "=== CONFIRMANDO CITA ===")
+
                 // Obtener información del trabajador actual
                 val meResponse = repository.getMe()
                 if (!meResponse.isSuccessful) {
+                    Log.e("AppointmentDialogViewModel", "Error en GET /me - Código: ${meResponse.code()}")
                     _errorMessage.value = "Error al obtener información del trabajador"
                     _isLoading.value = false
                     return@launch
@@ -67,14 +83,16 @@ class AppointmentDialogViewModel(private val repository: AppRepository) : ViewMo
 
                 val workerId = meResponse.body()?.worker?.id?.toString()
                 if (workerId == null) {
+                    Log.e("AppointmentDialogViewModel", "Worker ID no encontrado en respuesta de GET /me")
                     _errorMessage.value = "ID del trabajador no encontrado"
                     _isLoading.value = false
                     return@launch
                 }
 
-                Log.d("AppointmentDialogViewModel", "Confirmando cita: $appointmentId")
-                Log.d("AppointmentDialogViewModel", "Worker ID: $workerId")
-                Log.d("AppointmentDialogViewModel", "Category ID: ${cita.category_selected_id}")
+                Log.d("AppointmentDialogViewModel", "Ejecutando POST /appointments/$appointmentId/confirm")
+                Log.d("AppointmentDialogViewModel", "Request body:")
+                Log.d("AppointmentDialogViewModel", "- worker_id: \"$workerId\"")
+                Log.d("AppointmentDialogViewModel", "- category_selected_id: ${cita.category_selected_id}")
 
                 val response = repository.confirmCita(
                     appointmentId,
@@ -83,12 +101,14 @@ class AppointmentDialogViewModel(private val repository: AppRepository) : ViewMo
                 )
 
                 if (response.isSuccessful) {
-                    Log.d("AppointmentDialogViewModel", "Cita confirmada exitosamente")
+                    val updatedCita = response.body()
+                    Log.d("AppointmentDialogViewModel", "Cita confirmada exitosamente!")
+                    Log.d("AppointmentDialogViewModel", "Nuevo status: ${updatedCita?.status}")
                     _confirmResult.value = true
                 } else {
                     val errorBody = response.errorBody()?.string()
                     Log.e("AppointmentDialogViewModel", "Error al confirmar cita - Código: ${response.code()}")
-                    Log.e("AppointmentDialogViewModel", "Error al confirmar cita - Body: $errorBody")
+                    Log.e("AppointmentDialogViewModel", "Error body: $errorBody")
                     _errorMessage.value = "Error al confirmar la cita: ${response.code()}"
                 }
             } catch (e: Exception) {

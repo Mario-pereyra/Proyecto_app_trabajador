@@ -2,6 +2,7 @@ package com.example.proyectoapptrabajador.ui.dialogs
 
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,9 +50,13 @@ class ConfirmAppointmentDialog : DialogFragment() {
 
     private fun setupObservers() {
         viewModel.appointmentDetails.observe(viewLifecycleOwner) { cita ->
+            Log.d("ConfirmAppointmentDialog", "=== ACTUALIZANDO UI CON DETALLES DE CITA ===")
+            Log.d("ConfirmAppointmentDialog", "Cita recibida: $cita")
+
             binding.tvClienteNombre.text = "Cliente: ${cita.client.name} ${cita.client.profile.last_name}"
             binding.tvCategoria.text = "Servicio: ${cita.category.name}"
 
+            // Mostrar fecha y hora de la cita
             val fechaHora = if (cita.appointment_date != null && cita.appointment_time != null) {
                 "${formatearFecha(cita.appointment_date)} - ${formatearHora(cita.appointment_time)}"
             } else {
@@ -59,11 +64,13 @@ class ConfirmAppointmentDialog : DialogFragment() {
             }
             binding.tvFechaHora.text = "Fecha: $fechaHora"
 
-            // Mostrar/ocultar botón de ubicación según disponibilidad
-            binding.btnVerUbicacion.visibility = if (cita.latitude != null && cita.longitude != null) {
-                View.VISIBLE
+            // Mostrar/ocultar botón de ubicación según disponibilidad de coordenadas
+            if (cita.latitude != null && cita.longitude != null) {
+                binding.btnVerUbicacion.visibility = View.VISIBLE
+                Log.d("ConfirmAppointmentDialog", "Botón Ver Ubicación habilitado - Lat: ${cita.latitude}, Lng: ${cita.longitude}")
             } else {
-                View.GONE
+                binding.btnVerUbicacion.visibility = View.GONE
+                Log.d("ConfirmAppointmentDialog", "Botón Ver Ubicación deshabilitado - No hay coordenadas")
             }
         }
 
@@ -71,6 +78,8 @@ class ConfirmAppointmentDialog : DialogFragment() {
             if (success) {
                 Toast.makeText(context, "¡Cita confirmada exitosamente!", Toast.LENGTH_LONG).show()
                 dismiss()
+                // Navegar de vuelta al fragmento de citas para que se actualice la lista
+                findNavController().navigateUp()
             }
         }
 
@@ -80,6 +89,8 @@ class ConfirmAppointmentDialog : DialogFragment() {
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.btnSi.isEnabled = !isLoading
+            binding.btnNo.isEnabled = !isLoading
+            binding.btnVerUbicacion.isEnabled = !isLoading
             binding.btnSi.text = if (isLoading) "Confirmando..." else "Sí, Confirmar"
         }
     }
@@ -88,17 +99,22 @@ class ConfirmAppointmentDialog : DialogFragment() {
         binding.btnVerUbicacion.setOnClickListener {
             val cita = viewModel.appointmentDetails.value
             if (cita?.latitude != null && cita.longitude != null) {
+                Log.d("ConfirmAppointmentDialog", "Navegando al mapa con coordenadas: ${cita.latitude}, ${cita.longitude}")
                 val action = ConfirmAppointmentDialogDirections
                     .actionConfirmAppointmentDialogToMapaFragment(cita.latitude, cita.longitude)
                 findNavController().navigate(action)
+            } else {
+                Toast.makeText(context, "No hay ubicación disponible para esta cita", Toast.LENGTH_SHORT).show()
             }
         }
 
         binding.btnSi.setOnClickListener {
+            Log.d("ConfirmAppointmentDialog", "Usuario confirmó - Ejecutando confirmación de cita")
             viewModel.confirmAppointment(args.appointmentId)
         }
 
         binding.btnNo.setOnClickListener {
+            Log.d("ConfirmAppointmentDialog", "Usuario canceló - Cerrando diálogo")
             dismiss()
         }
     }
