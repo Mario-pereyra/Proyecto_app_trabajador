@@ -39,39 +39,47 @@ class ChatViewModel(private val repository: AppRepository) : ViewModel() {
         currentAppointmentId = appointmentId
         Log.d("ChatViewModel", "Iniciando chat para appointment ID: $appointmentId")
 
-        // Cargar detalles de la cita y obtener información del trabajador
-        loadAppointmentDetails(appointmentId)
-
-        // Cargar mensajes iniciales
-        loadChatMessages(appointmentId)
+        // Cargar detalles de la cita y obtener información del trabajador PRIMERO
+        // Solo después cargar mensajes para asegurar que currentWorkerId esté disponible
+        loadAppointmentDetailsAndThenMessages(appointmentId)
 
         // Iniciar polling automático cada 30 segundos
         startAutoRefresh()
     }
 
-    private fun loadAppointmentDetails(appointmentId: Int) {
+    private fun loadAppointmentDetailsAndThenMessages(appointmentId: Int) {
         viewModelScope.launch {
             try {
                 Log.d("ChatViewModel", "Cargando detalles de la cita...")
-                val response = repository.getAppointmentDetails(appointmentId)
 
+                // PRIMERO: Obtener información del trabajador actual usando GET /me
+                val meResponse = repository.getMe()
+                if (meResponse.isSuccessful) {
+                    currentWorkerId = meResponse.body()?.id
+                    Log.d("ChatViewModel", "Worker actual ID obtenido: $currentWorkerId")
+                } else {
+                    Log.e("ChatViewModel", "Error al obtener información del trabajador: ${meResponse.code()}")
+                    _errorMessage.value = "Error al obtener información del trabajador"
+                    return@launch
+                }
+
+                // SEGUNDO: Cargar detalles de la cita
+                val response = repository.getAppointmentDetails(appointmentId)
                 if (response.isSuccessful) {
                     val cita = response.body()
                     _citaDetails.value = cita
-
-                    // Obtener información del trabajador actual usando GET /me
-                    val meResponse = repository.getMe()
-                    if (meResponse.isSuccessful) {
-                        currentWorkerId = meResponse.body()?.id
-                        Log.d("ChatViewModel", "Worker actual ID: $currentWorkerId")
-                        Log.d("ChatViewModel", "Cliente ID: ${cita?.user_id}")
-                    }
-
+                    Log.d("ChatViewModel", "Cliente ID: ${cita?.user_id}")
                     Log.d("ChatViewModel", "Detalles de cita cargados: $cita")
                 } else {
                     Log.e("ChatViewModel", "Error al cargar detalles de cita: ${response.code()}")
                     _errorMessage.value = "Error al cargar información de la cita"
+                    return@launch
                 }
+
+                // TERCERO: Ahora que tenemos currentWorkerId, cargar mensajes
+                Log.d("ChatViewModel", "Cargando mensajes con workerId ya disponible...")
+                loadChatMessages(appointmentId)
+
             } catch (e: Exception) {
                 Log.e("ChatViewModel", "Excepción al cargar detalles de cita", e)
                 _errorMessage.value = "Error de conexión: ${e.message}"
